@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Obsidian Node Puzzle</title>
+  <style>
+    body {
+      background-color: #0a0a0f;
+      color: #00ffea;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      text-shadow: 0 0 8px #00ffee;
+    }
+    .puzzle-container {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(2, 120px);
+      gap: 20px;
+    }
+    .symbol {
+      width: 120px;
+      height: 120px;
+      border: 2px dashed #00ffea;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      cursor: grab;
+      user-select: none;
+      background-color: rgba(0, 255, 234, 0.05);
+    }
+    .dropzone {
+      width: 120px;
+      height: 120px;
+      border: 2px solid #444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+    #result {
+      margin-top: 30px;
+      font-size: 1.3rem;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+  </style>
+</head>
+<body>
+  <h1>Align the Four</h1>
+  <p>Drag the glowing symbols into the dropzones to reveal the path.</p>
+
+  <div class="puzzle-container">
+    <div class="symbol" draggable="true" id="star">★</div>
+    <div class="symbol" draggable="true" id="crystal">❖</div>
+    <div class="symbol" draggable="true" id="door">⬛</div>
+    <div class="symbol" draggable="true" id="circle">◯</div>
+  </div>
+
+  <div style="margin-top:40px; display:grid; grid-template-columns:repeat(4,120px); gap:20px;">
+    <div class="dropzone" data-symbol="star"></div>
+    <div class="dropzone" data-symbol="crystal"></div>
+    <div class="dropzone" data-symbol="door"></div>
+    <div class="dropzone" data-symbol="circle"></div>
+  </div>
+
+  <div id="result">✨ The Obsidian Node awaits in the Abandoned Ore Mine, Sector 7. Follow the fractured rails... ✨</div>
+
+  <script>
+    const symbols = document.querySelectorAll('.symbol');
+    const dropzones = document.querySelectorAll('.dropzone');
+    const result = document.getElementById('result');
+
+    symbols.forEach(sym => {
+      sym.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', sym.id);
+      });
+    });
+
+    dropzones.forEach(zone => {
+      zone.addEventListener('dragover', e => {
+        e.preventDefault();
+      });
+
+      zone.addEventListener('drop', e => {
+        const symbolId = e.dataTransfer.getData('text/plain');
+        const symbolEl = document.getElementById(symbolId);
+        if (zone.childNodes.length === 0) {
+          zone.appendChild(symbolEl);
+        }
+
+        checkPuzzle();
+      });
+    });
+
+    function checkPuzzle() {
+      const correctOrder = ['star','crystal','door','circle'];
+      const placed = Array.from(dropzones).map(z => z.firstChild ? z.firstChild.id : null);
+      if (JSON.stringify(correctOrder) === JSON.stringify(placed)) {
+        result.style.opacity = 1;
+      }
+    }
+  </script>
+</body>
+</html>
